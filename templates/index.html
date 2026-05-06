@@ -7,5 +7,10 @@
     </head>
     <body>
         <h1>Testing Successful</h1>
+        <ul>
+            {% for flower, details in flowers.items() %}
+            <li>{{ flower }} - ${{ details['price'] }} (Stock: {{ details['stock'] }})</li>
+            {% endfor %}
+        </ul>
     </body>
 </html>
