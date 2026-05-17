@@ -1,6 +1,10 @@
-{% extends "base.html" %}
-
-{% block title %}Home - Flower Shop{% endblock %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width">
+        <title>{% block title %}Flower Shop{% endblock %}</title>
+    </head>
 
 {% block content %}
     <body>
@@ -42,6 +46,5 @@
         <h4>Total: ${{ '%.2f' % total }}</h4>
 
     </body>
-
-
 {% endblock %}
+</html>

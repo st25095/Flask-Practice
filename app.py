@@ -19,7 +19,8 @@ def load_data():
 def index():
     flowers, addons = load_data()
     cart = session.get('cart', {})
-    return render_template("index.html", flowers=flowers, addons=addons, cart=cart)
+    total = calculate_total(cart)
+    return render_template("index.html", flowers=flowers, addons=addons, cart=cart, total=total)
 
 @app.route("/remove_from_cart/<item>")
 def remove_from_cart(item):
@@ -29,7 +30,7 @@ def remove_from_cart(item):
         del cart[item]
         session['cart'] = cart
         session.modified = True
-        flash(f"{item} removed from cart.")
+        flash(f"Removed all {item} from the cart.")
     else:
         flash("Item not found in cart.")
     return redirect(url_for('index'))
@@ -56,9 +57,13 @@ def add_to_cart():
 
     session['cart'] = cart
     session.modified = True
-    flash(f"{quantity} {flower}(s) added to your!!!! cart.")
+    flash(f"{quantity} {flower}(s) added to your cart!")
     print(f"SUCCESS: {quantity} {flower}(s) added to cart.") # Added myself to confirm the quantity
     return redirect(url_for('index'))
+
+def calculate_total(cart):
+    total = sum(item['price'] * item['quantity'] for item in cart.values())
+    return total
 
 
 if __name__ == '__main__':
