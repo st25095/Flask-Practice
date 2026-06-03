@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Invoices - Flower Shop{% endblock %}
+{% block content %}
+<h2>Invoices</h2>
+<p>This page will show the customer invoice after checkout</p>
+<p>Invoice Number: {{ invoice_number }}</p>
+<p>Customer Name: {{ customer_name }}</p>
+<p>Invoice Date: {{ invoice_date }}</p>
+<h2>Flowers</h2>
+        {% if cart %}
+            <ul>
+                {% for item, details in cart.items() %}
+                    <li>{{ item }}: {{ '%.2f' % details['quantity'] }} x ${{ details['price'] }}
+                        = ${{ details['quantity'] * details['price'] }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No Flowers purchased</p>
+        {% endif %}
+<h2>Addons</h2>
+        {% if selected_addons %}
+            <ul>
+                {% for item, details in selected_addons.items() %}
+                    <li>{{ item}}: ${{ details}}</li>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No Addons purchased</p>
+        {% endif %}
+<h1>Total: {{ total }}</h1>
+<a href="{{ url_for('index1') }}">Back to shop</a>
+{% endblock %}
