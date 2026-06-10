@@ -1,0 +1,13 @@
+Invoice Number: INV_Das_2026-06-09 14:48:07
+Customer Name: Das
+Date: 2026-06-09 14:48:07
+
+Items:
+
+- Orchid: 1 x $12 = $12.00
+- Rose: 19 x $10 = $190.00
+
+Addons:
+- Chocolates: $8.00
+
+Total: $189.00

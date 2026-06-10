@@ -1,10 +1,27 @@
 import datetime
 import json
+import sqlite3
 
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
+
+def initialise_database():
+    with sqlite3.connect('flower_shop.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS orders (
+                order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                invoice_number TEXT,
+                customer_name TEXT,
+                items TEXT,
+                addons TEXT,
+                total REAL,
+                date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) 
+        ''')
+
 
 def load_data():
     with open('data/flowers.json') as file:
@@ -21,7 +38,7 @@ def index():
     flowers, addons = load_data()
     cart = session.get('cart', {})
     selected_addons = session.get('selected_addons', {})
-    total = calculate_total(cart, selected_addons)
+    total, discount_applied = calculate_total(cart, selected_addons)
     return render_template("index.html", flowers=flowers, addons=addons, cart=cart, total=total, selected_addons = selected_addons)
 
 @app.route('/index1')
@@ -35,7 +52,22 @@ def about ():
 
 @app.route('/order')
 def order_history():
-    return render_template('order_history.html')
+    with sqlite3.connect('flower_shop.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM orders ORDER BY date DESC")
+        rows = cursor.fetchall()
+        orders = []
+        for row in rows:
+            orders.append({
+                'order_id': row[0],
+                'invoice_number': row[1],
+                'customer_name': row[2],
+                'items': json.loads(row[3]),
+                'addons': json.loads(row[4]),
+                'total': row[5],
+                'date': row[6]
+            })
+    return render_template('order_history.html', orders=orders)
 
 @app.route('/invoices')
 def invoices():
@@ -84,7 +116,10 @@ def calculate_total(cart, selected_addons):
     total = sum(item['price'] * item['quantity'] for item in cart.values())
     addons_total = sum(item for item in selected_addons.values())
     total += addons_total
-    return total
+    discount_applied = False
+    if total > 180:
+        discount_applied = True
+    return total, discount_applied
 
 @app.route('/select_addon', methods=['POST'])
 def select_addon():
@@ -111,6 +146,7 @@ def cancel_order():
 
 @app.route('/checkout', methods=['POST'])
 def checkout():
+    # Validate customer name
     customer_name = request.form['customer_name'].strip().title()
 
     if not customer_name:
@@ -123,14 +159,68 @@ def checkout():
         flash("Your cart is empty.")
         return redirect(url_for('index'))
     
-    total = calculate_total(cart, selected_addons)
+    # Calculate Total
+    total, applied_discount = calculate_total(cart, selected_addons)
+    discount_amount = 0.0
+    sub_total = total
+    if applied_discount:
+        sub_total = total
+        discount_amount = (total * 0.1)
+        total -= discount_amount
+        print("discount applied")
     invoice_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     invoice_number = f"INV_{customer_name.replace(' ', '_')}_{invoice_date}"
+    
+    # Save order to SQLite Database
+    with sqlite3.connect('flower_shop.db') as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO orders (invoice_number, customer_name, items, addons, total)
+            VALUES (?,?,?,?,?)
+        ''', (invoice_number, customer_name, json.dumps(cart), json.dumps(selected_addons), total))
+        conn.commit()
+    print(f"Cart: {cart}")
+    
+    # Generate Invoice File
+    invoice_filename = f"{invoice_number}.txt"
 
-    return render_template('invoices.html', customer_name = customer_name, invoice_date = invoice_date, invoice_number = invoice_number, cart = cart, selected_addons = selected_addons, total = total)
+    with open(invoice_filename, 'w') as f:
+        f.write(f"Invoice Number: {invoice_number}\n")
+        f.write(f"Customer Name: {customer_name}\n")
+        f.write(f"Date: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+        f.write(f"Items:\n\n")
+        for item, details in cart.items():
+            f.write(f"- {item}: {details['quantity']} x ${details['price']} = ${details['quantity'] * details['price']:.2f}\n")
+        f.write(f"\nAddons:\n")
+        if selected_addons:
+            for addon, price in selected_addons.items():
+                f.write(f"- {addon}: ${price:.2f}\n")
+        else:
+            f.write(f"- None\n")
+        f.write(f"\nTotal: ${total:.2f}\n")
+
+    # Update the stock in flowers.json
+
+    with open('data/flowers.json', 'r') as file:
+        flower_data = json.load(file)
+    
+    for flower_name, details in cart.items():
+        if flower_name in flower_data:
+            flower_data[flower_name]['stock'] -= details['quantity']
+            if flower_data[flower_name]['stock'] < 0:
+                flower_data[flower_name]['stock'] = 0 # Prevents negative stock
+    
+    with open('data/flowers.json', 'w') as file:
+        json.dump(flower_data, file, indent=4)
+    
+    session.modified = True
+
+    # Render the invoice html
+    return render_template('invoices.html', customer_name = customer_name, invoice_date = invoice_date, invoice_number = invoice_number, cart = cart, selected_addons = selected_addons, total = total, applied_discount = applied_discount, discount_amount = discount_amount, sub_total = sub_total)
 
 
 if __name__ == '__main__':
+    initialise_database()
     app.run(debug=True, port=8000)
     # For some reason the browser says refused to connect. 
     # Gemini AI said to change the port from 5000 to 8000 for Mac.
