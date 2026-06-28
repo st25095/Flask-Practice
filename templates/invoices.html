@@ -3,7 +3,7 @@
 {% block title %}Invoices - Flower Shop{% endblock %}
 {% block content %}
 <h2>Invoices</h2>
-<p>This page will show the customer invoice after checkout</p>
+<p>This page will show the customer invoice after checkout. You can view it but data will only show when you checkout.</p>
 <p>Invoice Number: {{ invoice_number }}</p>
 <p>Customer Name: {{ customer_name }}</p>
 <p>Invoice Date: {{ invoice_date }}</p>
@@ -31,10 +31,14 @@
             <p>No Addons purchased</p>
         {% endif %}
 <h2>Summary</h2>
-        <p>Subtotal: ${{ '%.2f' % sub_total }}</p>
+        {% if sub_total %}
+            <p>Subtotal: ${{ '%.2f' % sub_total }}</p>
+        {% endif %}
         {% if applied_discount %}
             <p>Discount (10%): -${{ '%.2f' % discount_amount }}</p>
         {% endif %}
-<h1>Total: ${{ '%.2f' % total }}</h1>
+{% if total %}
+    <h1>Total: ${{ '%.2f' % total }}</h1>
+{% endif %}
 <a href="{{ url_for('index1') }}">Back to shop</a>
 {% endblock %}

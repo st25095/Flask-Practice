@@ -1,0 +1,13 @@
+Invoice Number: INV_Russell_2026-06-22 13:02:41
+Customer Name: Russell
+Date: 2026-06-22 13:02:41
+
+Items:
+
+- Orchid: 1 x $12 = $12.00
+
+Addons:
+- A kiss from Kellum Byers: $0.00
+- Delivery: $10.00
+
+Total: $22.00

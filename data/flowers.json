@@ -5,11 +5,11 @@
     },
     "Tulip": {
         "price": 10,
-        "stock": 40
+        "stock": 0
     },
     "Lily": {
         "price": 10,
-        "stock": 28
+        "stock": 100
     },
     "Daisy": {
         "price": 10,
@@ -17,6 +17,6 @@
     },
     "Orchid": {
         "price": 12,
-        "stock": 23
+        "stock": 99
     }
 }

@@ -3,5 +3,7 @@
     "Specialty Wrapping Paper": {"price": 5},
     "Personalised Note": {"price": 3},
     "Delivery": {"price": 10},
-    "Chocolates": {"price": 8}
+    "Chocolates": {"price": 8},
+    "A kiss from Kellum Byers": {"price": 98},
+    "A kiss from Liam Nguyen": {"price": 100}
 }

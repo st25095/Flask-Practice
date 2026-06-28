@@ -14,6 +14,7 @@
                 <th>Addons</th>
                 <th>Total</th>
                 <th>Date</th>
+                <th>Cancel Order</th>
             </tr>
         </thead>
         <tbody>
@@ -24,17 +25,25 @@
                     <td>
                         <ul>
                             {% for item, details in order['items'].items() %}
-                            <li>{{ item }}:</li>
+                            <li>{{ item }}: ${{ details['price'] }} x {{ details['quantity'] }}</li>
+                            {% endfor %}
                         </ul>
                     </td>
                     <td>
                         <ul>
                             {% for addon, price in order['addons'].items() %}
-                            <li>{{ addon }}:</li>
+                            <li>{{ addon }}: ${{ price }}</li>
+                            {% endfor %}
                         </ul>
                     </td>
                     <td>${{ '%.2f' % order['total'] }}</td>
                     <td>{{ order['date'] }}</td>
+                    <td>
+                        <form action="{{ url_for('cancel_saved_order', order_id=order.order_id) }}" method="POST">
+                            <!--Finish this. last left off at slide 23-->
+                            <button type="submit" onclick="return confirm('Cancel this order?')">Cancel Order</button>
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -1,0 +1,12 @@
+Invoice Number: INV_Liam_Nguyen_2026-06-19 10:29:51
+Customer Name: Liam Nguyen
+Date: 2026-06-19 10:29:51
+
+Items:
+
+- Rose: 200 x $10 = $2000.00
+
+Addons:
+- A kiss from Kellum Byers: $0.15
+
+Total: $1800.13

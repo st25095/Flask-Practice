@@ -1,0 +1,13 @@
+Invoice Number: INV_Lucas_2026-06-15 11:02:30
+Customer Name: Lucas
+Date: 2026-06-15 11:02:30
+
+Items:
+
+- Orchid: 4 x $12 = $48.00
+- Rose: 1 x $10 = $10.00
+
+Addons:
+- Chocolates: $8.00
+
+Total: $66.00

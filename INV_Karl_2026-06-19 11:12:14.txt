@@ -1,0 +1,12 @@
+Invoice Number: INV_Karl_2026-06-19 11:12:14
+Customer Name: Karl
+Date: 2026-06-19 11:12:14
+
+Items:
+
+- Tulip: 40 x $10 = $400.00
+
+Addons:
+- None
+
+Total: $360.00
